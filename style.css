@@ -1,0 +1,18 @@
+body {
+	font-family: "Crimson Text", serif;
+	font-size: 1.2em;
+	padding: 22px;
+}
+
+.theorem, .proof, .lemma, .corollary {
+	width: 80%;
+	padding: 12px;
+	margin: auto;
+/*	font-family: "Crimson text Italic";*/
+	font-style: italic;
+}
+
+.theorem h3 {
+	font-size: 1.2em;
+	padding: 0;
+}
