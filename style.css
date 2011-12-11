@@ -1,18 +1,26 @@
+h1, h2, h3 {
+	margin: 0;
+	padding: 0;
+}
+
 body {
 	font-family: "Crimson Text", serif;
 	font-size: 1.2em;
-	padding: 22px;
+	padding-left: 25px;
+	color: #222;
 }
 
-.theorem, .proof, .lemma, .corollary {
-	width: 80%;
-	padding: 12px;
-	margin: auto;
-/*	font-family: "Crimson text Italic";*/
+.theorem, .lemma, .corollary {
 	font-style: italic;
 }
 
-.theorem h3 {
-	font-size: 1.2em;
-	padding: 0;
+h2 {
+	font: 2em/1 'IM Fell Great Primer SC', serif;
+	margin-left: -15px;
+}
+
+.theorem h3, .proof h3 {
+	font: 0.9em 'IM Fell Great Primer SC', serif;
+	color: #444;
+	margin: 12px 0 0 -12px;
 }

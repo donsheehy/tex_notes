@@ -1,29 +1,33 @@
 <html>
   <head>
-    <link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <link href='http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer:400,400italic|IM+Fell+Great+Primer+SC|Crimson+Text:400,400italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="style.css" type="text/css" media="screen" charset="utf-8">
     <script type='text/x-mathjax-config'>
-      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\(','\)']]}});
     </script>
     <script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type='text/javascript'></script>
+
   </head>
   <body>
-    <div id="page">
-      Hello World.
-      This is an equation $x^{O(d^2)}$.
-    
-      Here is another:
+    <div id='page'>
+      <h2 class='section'>This is a test</h2> 
+      <a href="sec_this_is_a_test"></a>
+
+      Some introductory prose including some math: $x = {n \choose 2}$.
+      There is also an equation environment:
       \[
-        x = \sum_{i=1}^{100} \frac{y^i}{d!} \text{ where } x = 100
+        e^x = \sum_{i=1}^\infty \frac{x^i}{i!}.
       \]
-      
-      This is a little unfortunate in that it requires a total refresh each time I edit the note.
-      It looks pretty bad.
-      It really ought to use some kind of fast tree diff.
-    
-      <div class="theorem">
-        <h3>Theorem 1</h3>
-        Given $d+2$ points in $R^d$, there exists a points $p$ such that 
+
+      This is a new paragraph.
+
+      Next we give a theorem.
+
+      <div class='theorem'><h3>Theorem 1.</h3><a href="thm_true_theorem"></a>
+          It's true!
+      </div>
+      <div class='proof'><h3>Proof.</h3>
+          I promise.
       </div>
     </div>
   </body>
