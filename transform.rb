@@ -20,14 +20,14 @@ footer = "
 puts header
 
 counters = Hash.new(0)
-
 macros = []
+paragraph_state = :none
 
 IO.foreach('/Users/dsheehy/research/tex_notes/macros.tex') do |line|
   md = line.match(/newcommand\{(\\[a-zA-Z]*)\}\{(.*)\}/)
   if md
-    # macros << [md[1], md[2]]
-    macros << [/(#{"\\" + md[1]})[^a-zA-Z]/, md[1], md[2]]
+    macros << [md[1], md[2]]
+    # macros << [/(#{"\\" + md[1]})[^a-zA-Z]/, md[1], md[2]]
     line = ''
   end
 end
@@ -36,14 +36,20 @@ ARGF.each do |line|
   
   # Do replacements for macros
   macros.each do |m|
-    # 15.times do
-    while (md = line.match(m[0]))
+    while (md = line.match(/(#{"\\" + m[0]})[^a-zA-Z]/))
       if md
-        line.sub!(m[1],m[2])
+        line.sub!(m[0],m[1])
       end
     end
   end
+
+  line.sub!('\begin{itemize}','<ul>')
+  line.sub!('\end{itemize}','</ul>')
+  line.sub!('\begin{enumerate}','<ul>')
+  line.sub!('\end{enumerate}','</ul>')
+  line.sub!('\item','<li>')
   
+
   # Check for numbered entities like theorems.
   md = line.match(/.*\\begin\{(\w*)\}/)
   if md
@@ -58,8 +64,29 @@ ARGF.each do |line|
   line.sub!(/.*\\end\{\w*\}/, '</div>')
   line.sub!(/\\label\{(\w*):(\w*)\}/, "<a href=\"\\1_\\2\"></a>")
   line.sub!(/\\section\{(.*)\}/, "<h2 class=\'section\'>\\1</h2>")
+  line.sub!(/\\subsection\{(.*)\}/, "<h2 class=\'subsection\'>\\1</h2>")
   line.sub!(/.*\% section \w* \(end\)/, "</div>")
-  line.sub!(/(.*)\%.*/, "\\1")  
+  line.sub!(/(.*)\%.*/, "\\1")
+  line.gsub!(/\\textbf\{([^\}]*)\}/, "<span class='textbf'>\\1</span>")
+  line.gsub!(/\\texttt\{([^\}]*)\}/, "<span class='texttt'>\\1</span>")
+  line.gsub!(/\\textsc\{([^\}]*)\}/, "<span class='textsc'>\\1</span>")
+  line.gsub!(/\\emph\{([^\}]*)\}/, "<span class='emph'>\\1</span>")
+  
+  # Paragraphs
+  if line.match(/^\s*$/)
+    case paragraph_state
+    when :none
+      paragraph_state = :starting
+    when :during
+      line = '</p>'
+    end
+  else
+    case paragraph_state
+    when :starting
+      paragraph_state = :during
+      puts '<p>'
+    end
+  end
 
   # Create new macros with newcommand
   # md = line.match(/newcommand\{(.*)\}\{(.*)\}/)

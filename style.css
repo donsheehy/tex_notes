@@ -19,8 +19,17 @@ body {
 }
 
 h2 {
-	font: 2em/1 'IM Fell Great Primer SC', serif;
+	font-family: 'IM Fell Great Primer SC', serif;
 	margin-left: -15px;
+}
+
+
+h2.section {
+	font-size: 2em;
+}
+
+h2.subsection {
+	font-size: 1.5em;
 }
 
 h3 {
@@ -28,3 +37,8 @@ h3 {
 	color: #444;
 	margin: 12px 0 0 -12px;
 }
+
+.textbf {font-weight: bold;}
+.textsc {font-variant: small-caps;}
+.texttt {font-family: "Courrier New", Courrier, sans-serif;}
+.emph { font-style: italic;}
