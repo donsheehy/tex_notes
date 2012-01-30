@@ -1,13 +1,15 @@
+HERE = File.expand_path(File.dirname(__FILE__))
+STYLESHEET = File.join(HERE, 'style.css')
+MACROS = File.join(HERE, 'macros.tex')
 
 header = "<html>
   <head>
     <link href='http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer:400,400italic|IM+Fell+Great+Primer+SC|Crimson+Text:400,400italic' rel='stylesheet' type='text/css'>
-    <link rel=\"stylesheet\" href=\"../style.css\" type=\"text/css\" media=\"screen\" charset=\"utf-8\">
+    <link rel=\"stylesheet\" href=\"#{STYLESHEET}\" type=\"text/css\" media=\"screen\" charset=\"utf-8\">
     <script type='text/x-mathjax-config'>
-      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\\\(','\\\\)']]}});
     </script>
     <script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type='text/javascript'></script>
-
   </head>
   <body>
     <div id='page'>"
@@ -23,7 +25,7 @@ counters = Hash.new(0)
 macros = []
 paragraph_state = :none
 
-IO.foreach('/Users/dsheehy/research/tex_notes/macros.tex') do |line|
+IO.foreach(MACROS) do |line|
   md = line.match(/newcommand\{(\\[a-zA-Z]*)\}\{(.*)\}/)
   if md
     macros << [md[1], md[2]]
@@ -45,8 +47,8 @@ ARGF.each do |line|
 
   line.sub!('\begin{itemize}','<ul>')
   line.sub!('\end{itemize}','</ul>')
-  line.sub!('\begin{enumerate}','<ul>')
-  line.sub!('\end{enumerate}','</ul>')
+  line.sub!('\begin{enumerate}','<ol>')
+  line.sub!('\end{enumerate}','</ol>')
   line.sub!('\item','<li>')
   
 
@@ -63,8 +65,8 @@ ARGF.each do |line|
   end
   line.sub!(/.*\\end\{\w*\}/, '</div>')
   line.sub!(/\\label\{(\w*):(\w*)\}/, "<a href=\"\\1_\\2\"></a>")
-  line.sub!(/\\section\{(.*)\}/, "<h2 class=\'section\'>\\1</h2>")
-  line.sub!(/\\subsection\{(.*)\}/, "<h2 class=\'subsection\'>\\1</h2>")
+  line.sub!(/\\section\*?\{(.*)\}/, "<h2 class=\'section\'>\\1</h2>")
+  line.sub!(/\\subsection\*?\{(.*)\}/, "<h2 class=\'subsection\'>\\1</h2>")
   line.sub!(/.*\% section \w* \(end\)/, "</div>")
   line.sub!(/(.*)\%.*/, "\\1")
   line.gsub!(/\\textbf\{([^\}]*)\}/, "<span class='textbf'>\\1</span>")
