@@ -63,6 +63,9 @@ ARGF.each do |line|
       line.sub!(/.*\\begin\{(\w*)\}/, "<div class=\'#{div_class}\'><h3>#{div_class.capitalize}.</h3>")      
     end
   end
+  line.sub!(/``/, "&#8220;")
+  line.sub!(/''/, "&#8221;")
+  line.sub!(/\\\s/, " ")
   line.sub!(/.*\\end\{\w*\}/, '</div>')
   line.sub!(/\\label\{(\w*):(\w*)\}/, "<a href=\"\\1_\\2\"></a>")
   line.sub!(/\\section\*?\{(.*)\}/, "<h2 class=\'section\'>\\1</h2>")
