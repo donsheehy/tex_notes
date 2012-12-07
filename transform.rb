@@ -1,27 +1,14 @@
+#!/usr/bin/env ruby
+
+require 'erb'
+require 'haml'
+require 'tilt'
+
+Dir.chdir(ENV['PWD'])
 HERE = File.expand_path(File.dirname(__FILE__))
-STYLESHEET = File.join(HERE, 'style.css')
 MACROS = File.join(HERE, 'macros.tex')
 
-header = "<html>
-  <head>
-    <link href='http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer:400,400italic|IM+Fell+Great+Primer+SC|Crimson+Text:400,400italic' rel='stylesheet' type='text/css'>
-    <link rel=\"stylesheet\" href=\"#{STYLESHEET}\" type=\"text/css\" media=\"screen\" charset=\"utf-8\">
-    <script type='text/x-mathjax-config'>
-      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\\\(','\\\\)']]}});
-    </script>
-    <script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type='text/javascript'></script>
-  </head>
-  <body>
-    <div id='page'>"
-    
-footer = "
-        </div>
-      </body>
-    </html>"    
-
-puts header
-
-counters = Hash.new(0)
+output = ""
 macros = []
 paragraph_state = :none
 
@@ -29,7 +16,6 @@ IO.foreach(MACROS) do |line|
   md = line.match(/newcommand\{(\\[a-zA-Z]*)\}\{(.*)\}/)
   if md
     macros << [md[1], md[2]]
-    # macros << [/(#{"\\" + md[1]})[^a-zA-Z]/, md[1], md[2]]
     line = ''
   end
 end
@@ -45,63 +31,56 @@ ARGF.each do |line|
     end
   end
 
+  # Handle list environments
   line.sub!('\begin{itemize}','<ul>')
   line.sub!('\end{itemize}','</ul>')
   line.sub!('\begin{enumerate}','<ol>')
   line.sub!('\end{enumerate}','</ol>')
   line.sub!('\item','<li>')
   
-
-  # Check for numbered entities like theorems.
-  md = line.match(/.*\\begin\{(\w*)\}/)
-  if md
-    div_class = md[1]
-    if div_class =~ (/theorem|lemma|corollary|definition/)
-    counters[div_class] += 1 
-      line.sub!(/.*\\begin\{(\w*)\}/, "<div class=\'#{div_class}\'><h3>#{div_class.capitalize} #{counters[div_class]}.</h3>")
-    else
-      line.sub!(/.*\\begin\{(\w*)\}/, "<div class=\'#{div_class}\'><h3>#{div_class.capitalize}.</h3>")      
-    end
+  # Math environemnts that become divs
+  %w{theorem lemma corollary definition observation remark proposition proof}.each do |env|
+    line.sub!(/\\begin\{#{env}\}/, "<div class=\'#{env}\'><h3>#{env.capitalize}.</h3>")
+    line.sub!(/\\end\{#{env}\}/, '</div>')
   end
+
+  # Text environments that become divs
+  %w{section subsection subsubsection abstract}.each do |env|
+    line.sub!(/\\#{env}\*?\{(.*)\}/, "<div class=\'#{env}\'><h2>\\1</h2>")
+  end
+
+  %w{textbf texttt textsc emph}.each do |style|
+    line.gsub!(/\\#{style}\{([^\}]*)\}/, "<span class='#{style}'>\\1</span>")
+  end
+
+  # Whitespace and quotation marks
   line.sub!(/``/, "&#8220;")
   line.sub!(/''/, "&#8221;")
   line.sub!(/\\\s/, " ")
-  line.sub!(/.*\\end\{\w*\}/, '</div>')
+  
+  # Labels
   line.sub!(/\\label\{(\w*):(\w*)\}/, "<a href=\"\\1_\\2\"></a>")
-  line.sub!(/\\section\*?\{(.*)\}/, "<h2 class=\'section\'>\\1</h2>")
-  line.sub!(/\\subsection\*?\{(.*)\}/, "<h2 class=\'subsection\'>\\1</h2>")
-  line.sub!(/.*\% section \w* \(end\)/, "</div>")
+
+  # Strip comments
   line.sub!(/(.*)\%.*/, "\\1")
-  line.gsub!(/\\textbf\{([^\}]*)\}/, "<span class='textbf'>\\1</span>")
-  line.gsub!(/\\texttt\{([^\}]*)\}/, "<span class='texttt'>\\1</span>")
-  line.gsub!(/\\textsc\{([^\}]*)\}/, "<span class='textsc'>\\1</span>")
-  line.gsub!(/\\emph\{([^\}]*)\}/, "<span class='emph'>\\1</span>")
   
   # Paragraphs
-  if line.match(/^\s*$/)
-    case paragraph_state
-    when :none
+  empty_line = (line =~ /^\s*$/)
+  case [paragraph_state, empty_line]
+    when [:none, empty_line]
       paragraph_state = :starting
-    when :during
-      line = '</p>'
-    end
-  else
-    case paragraph_state
-    when :starting
+    when [:during, 0]
+      line = "</p>\n"
+      paragraph_state = :starting
+    when [:starting, nil]
       paragraph_state = :during
-      puts '<p>'
-    end
+      line.insert(0, "<p>\n")
   end
 
-  # Create new macros with newcommand
-  # md = line.match(/newcommand\{(.*)\}\{(.*)\}/)
-  # if md
-  #   macros << [md[1], md[2]]
-  #   line = ''
-  # end
-
-  puts line
+  output << line
 end
 
-puts footer
+# template = Tilt.new('layout.html.erb')
+# puts template.render{output}
 
+puts output
