@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
 require 'erb'
 require 'haml'
 require 'tilt'
@@ -7,6 +8,7 @@ require 'tilt'
 Dir.chdir(ENV['PWD'])
 HERE = File.expand_path(File.dirname(__FILE__))
 MACROS = File.join(HERE, 'macros.tex')
+LAYOUT = File.join(HERE, 'marked_layout.html.erb')
 
 output = ""
 macros = []
@@ -80,7 +82,5 @@ ARGF.each do |line|
   output << line
 end
 
-# template = Tilt.new('layout.html.erb')
-# puts template.render{output}
-
-puts output
+template = Tilt.new(LAYOUT)
+puts template.render{output}
