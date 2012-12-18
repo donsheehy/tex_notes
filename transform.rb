@@ -33,6 +33,14 @@ ARGF.each do |line|
     end
   end
 
+  # Collect new macros
+  md = line.match(/newcommand\{(\\[a-zA-Z]*)\}\{(.*)\}/)
+  if md
+    macros << [md[1], md[2]]
+    line = ''
+  end
+  
+
   # Handle list environments
   line.sub!('\begin{itemize}','<ul>')
   line.sub!('\end{itemize}','</ul>')
@@ -50,6 +58,8 @@ ARGF.each do |line|
   %w{section subsection subsubsection abstract}.each do |env|
     line.sub!(/\\#{env}\*?\{(.*)\}/, "<div class=\'#{env}\'><h2>\\1</h2>")
   end
+  line.sub!(/\%.*\(end\)/, '</div>')
+
 
   %w{textbf texttt textsc emph}.each do |style|
     line.gsub!(/\\#{style}\{([^\}]*)\}/, "<span class='#{style}'>\\1</span>")
@@ -58,7 +68,7 @@ ARGF.each do |line|
   # Whitespace and quotation marks
   line.sub!(/``/, "&#8220;")
   line.sub!(/''/, "&#8221;")
-  line.sub!(/\\\s/, " ")
+  line.sub!(/[^\\]\\\s/, " ")
   
   # Labels
   line.sub!(/\\label\{(\w*):(\w*)\}/, "<a href=\"\\1_\\2\"></a>")
