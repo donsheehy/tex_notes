@@ -25,6 +25,8 @@ end
 ARGF.each do |line|
   
   # Do replacements for macros
+  # It looks wierd, but I don't know how to make it work otherwise.
+  # gsub does the wrong thing.
   macros.each do |m|
     while (md = line.match(/(#{"\\" + m[0]})[^a-zA-Z]/))
       if md
@@ -40,18 +42,17 @@ ARGF.each do |line|
     line = ''
   end
   
-
   # Handle list environments
-  line.sub!('\begin{itemize}','<ul>')
-  line.sub!('\end{itemize}','</ul>')
-  line.sub!('\begin{enumerate}','<ol>')
-  line.sub!('\end{enumerate}','</ol>')
-  line.sub!('\item','<li>')
+  line.gsub!('\begin{itemize}','<ul>')
+  line.gsub!('\end{itemize}','</ul>')
+  line.gsub!('\begin{enumerate}','<ol>')
+  line.gsub!('\end{enumerate}','</ol>')
+  line.gsub!('\item','<li>')
   
   # Math environemnts that become divs
   %w{theorem lemma corollary definition observation remark proposition proof}.each do |env|
-    line.sub!(/\\begin\{#{env}\}/, "<div class=\'#{env}\'><h3>#{env.capitalize}.</h3>")
-    line.sub!(/\\end\{#{env}\}/, '</div>')
+    line.gsub!(/\\begin\{#{env}\}/, "<div class=\'#{env}\'><h3>#{env.capitalize}.</h3>")
+    line.gsub!(/\\end\{#{env}\}/, '</div>')
   end
 
   # Text environments that become divs
@@ -66,9 +67,9 @@ ARGF.each do |line|
   end
 
   # Whitespace and quotation marks
-  line.sub!(/``/, "&#8220;")
-  line.sub!(/''/, "&#8221;")
-  line.sub!(/[^\\]\\\s/, " ")
+  line.gsub!(/``/, "&#8220;")
+  line.gsub!(/''/, "&#8221;")
+  line.gsub!(/[^\\]\\\s/, " ")
   
   # Labels
   line.sub!(/\\label\{(\w*):(\w*)\}/, "<a href=\"\\1_\\2\"></a>")
