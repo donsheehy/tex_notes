@@ -7,6 +7,7 @@ require 'tilt'
 
 Dir.chdir(ENV['PWD'])
 HERE = File.expand_path(File.dirname(__FILE__))
+# HERE = ENV['HOME']
 MACROS = File.join(HERE, 'macros.tex')
 LAYOUT = File.join(HERE, 'marked_layout.html.erb')
 
@@ -56,7 +57,7 @@ ARGF.each do |line|
   end
 
   # Text environments that become divs
-  %w{section subsection subsubsection abstract}.each do |env|
+  %w{section subsection subsubsection abstract paragraph}.each do |env|
     line.sub!(/\\#{env}\*?\{(.*)\}/, "<div class=\'#{env}\'><h2>\\1</h2>")
   end
   line.sub!(/\%.*\(end\)/, '</div>')
